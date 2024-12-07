@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import supabase from "./supabase/config";
 import EditModal from "./components/EditModal";
+import CreateRestaurantForm from "./components/CreateRestaurantForm";
+import RestaurantCard from "./components/RestaurantCard";
+import DeleteModal from "./components/DeleteModal";
 
 function App() {
   const [restaurants, setRestaurants] = useState([]);
   const [ratingFilter, setRatingFilter] = useState(0);
-  const [name, setName] = useState("");
-  const [rating, setRating] = useState(0);
-  const [type, setType] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [restaurantToDelete, setRestaurantToDelete] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -29,15 +29,7 @@ function App() {
     }
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-
-    const newRestaurant = {
-      name,
-      rating,
-      type,
-    };
-
+  async function handleSubmit(newRestaurant) {
     try {
       const response = await supabase
         .from("restaurants")
@@ -121,32 +113,9 @@ function App() {
         {showCreateForm ? "Hide Create Restaurant" : "Show Create Restaurant"}
       </button>
       {showCreateForm && (
-        <>
-          <h3>Create a new restaurant:</h3>
-          <form onSubmit={handleSubmit}>
-            <label htmlFor="">Name</label>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              type="text"
-            />
-            <label htmlFor="">Rating</label>
-            <input
-              value={rating}
-              onChange={(e) => setRating(Number(e.target.value))}
-              type="number"
-              min={0}
-              max={10}
-            />
-            <label htmlFor="">Type</label>
-            <input
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              type="text"
-            />
-            <button type="submit">Create</button>
-          </form>
-        </>
+        <CreateRestaurantForm
+          handleSubmit={handleSubmit}
+        />
       )}
       <label htmlFor="">Filter:</label>
       <select onChange={(e) => setRatingFilter(Number(e.target.value))}>
@@ -158,34 +127,22 @@ function App() {
       </select>
 
       <div className="restaurant-list">
-        {restaurants.map((restaurant) => {
-          return (
-            <div className="card" key={restaurant.id}>
-              <h3>{restaurant.name}</h3>
-              <p>{restaurant.type}</p>
-              <p>{restaurant.rating}⭐</p>
-              <button className="danger" onClick={() => openModal(restaurant)}>
-                Delete
-              </button>
-              <button onClick={() => openEditModal(restaurant)}>Edit</button>
-            </div>
-          );
-        })}
+        {restaurants.map((restaurant) => (
+          <RestaurantCard
+            key={restaurant.id}
+            restaurant={restaurant}
+            openModal={openModal}
+            openEditModal={openEditModal}
+          />
+        ))}
       </div>
 
       {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Confirm Deletion</h2>
-            <p>Are you sure you want to delete "{restaurantToDelete.name}"?</p>
-            <div className="modal-buttons">
-              <button className="danger" onClick={confirmDelete}>
-                Yes, Delete
-              </button>
-              <button onClick={closeModal}>Cancel</button>
-            </div>
-          </div>
-        </div>
+        <DeleteModal
+          restaurantToDelete={restaurantToDelete}
+          confirmDelete={confirmDelete}
+          closeModal={closeModal}
+        />
       )}
 
       {isEditModalOpen && restaurantToEdit && (
