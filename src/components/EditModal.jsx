@@ -1,14 +1,14 @@
-
 import { useState } from "react";
 
 function EditModal({ restaurant, onClose, onSave }) {
   const [name, setName] = useState(restaurant.name);
   const [rating, setRating] = useState(restaurant.rating);
   const [type, setType] = useState(restaurant.type);
+  const [url, setUrl] = useState(restaurant.url);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({ name, rating, type });
+    onSave({ name, rating, type, url });
   };
 
   return (
@@ -34,6 +34,12 @@ function EditModal({ restaurant, onClose, onSave }) {
           <input
             value={type}
             onChange={(e) => setType(e.target.value)}
+            type="text"
+          />
+          <label>Url de google maps</label>
+          <input
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
             type="text"
           />
           <div className="modal-buttons">

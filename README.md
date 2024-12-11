@@ -1,8 +1,25 @@
-# React + Vite
+# Nombre de la app
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Descripción
 
-Currently, two official plugins are available:
+Descripción de la app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Rutas de la app
+
+| Ruta                  | Descripción                                  |
+| --------------------- | -------------------------------------------- |
+| /restaurants          | Muestra todos los restaurantes               |
+| /restaurants/:id      | Muestra un restaurante en particular         |
+| /restaurants/new      | Formulario para agregar un nuevo restaurante |
+| /restaurants/:id/edit | Formulario para editar un restaurante        |
+
+## Integrantes
+Marcela, Juan, Pedro, María
+
+## Tecnologías
+
+- React
+- Supabase
+- React-Router-dom
+- Axios/fetch
+- APIs externas
