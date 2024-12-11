@@ -14,16 +14,24 @@ function App() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [restaurantToEdit, setRestaurantToEdit] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [types, setTypes] = useState([]);
+  const [typeFilter, setTypeFilter] = useState("");
 
   async function getRestaurants() {
     try {
       const response = await supabase
         .from("restaurants")
         .select()
-        .gt("rating", ratingFilter)
+        .ilike("type", `%${typeFilter}%`)
         .order("rating", { ascending: true });
 
       setRestaurants(response.data);
+      if (types.length === 0) {
+        const types = new Set(
+          response.data.map((restaurant) => restaurant.type)
+        );
+        setTypes(Array.from(types));
+      }
     } catch (error) {
       console.error(error);
     }
@@ -34,7 +42,9 @@ function App() {
       const response = await supabase
         .from("restaurants")
         .insert([newRestaurant]);
-      console.log(response);
+      if (response.error) {
+        throw response.error;
+      }
       getRestaurants();
     } catch (error) {
       console.error(error);
@@ -43,10 +53,10 @@ function App() {
 
   async function deleteRestaurant(id) {
     try {
-      console.log(id);
-
       const response = await supabase.from("restaurants").delete().eq("id", id);
-      console.log(response);
+      if (response.error) {
+        throw response.error;
+      }
       getRestaurants();
     } catch (error) {
       console.error(error);
@@ -59,8 +69,9 @@ function App() {
         .from("restaurants")
         .update(updatedData)
         .eq("id", id);
-
-      console.log(response);
+      if (response.error) {
+        throw response.error;
+      }
       getRestaurants();
     } catch (error) {
       console.error(error);
@@ -105,25 +116,23 @@ function App() {
 
   useEffect(() => {
     getRestaurants();
-  }, [ratingFilter]);
+  }, [typeFilter]);
 
   return (
     <>
+      <h1>REACTORANTS</h1>
       <button onClick={toggleCreateForm}>
-        {showCreateForm ? "Hide Create Restaurant" : "Show Create Restaurant"}
+        {showCreateForm ? "Hide Create Restaurant" : "Create Restaurant"}
       </button>
-      {showCreateForm && (
-        <CreateRestaurantForm
-          handleSubmit={handleSubmit}
-        />
-      )}
+      {showCreateForm && <CreateRestaurantForm handleSubmit={handleSubmit} />}
       <label htmlFor="">Filter:</label>
-      <select onChange={(e) => setRatingFilter(Number(e.target.value))}>
-        <option value={0}>more than 0 ⭐</option>
-        <option value={5}>more than 5 ⭐</option>
-        <option value={6}>more than 6 ⭐</option>
-        <option value={7}>more than 7 ⭐</option>
-        <option value={8}>more than 8 ⭐</option>
+      <select onChange={(e) => setTypeFilter(e.target.value)}>
+        <option value="">All</option>
+        {types.map((type) => (
+          <option key={type} value={type}>
+            {type}
+          </option>
+        ))}
       </select>
 
       <div className="restaurant-list">
